@@ -1,0 +1,1 @@
+This folder contains a code to run a simple website which stores data in the database like email and name and retrive the data when necessary using simple sql commands
