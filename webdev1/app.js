@@ -5,7 +5,7 @@ const { Client } = require('pg');
 
 // Configure the database connection
 const config = {
-  connectionString: 'postgres://thxxhadd:NrLNnV3u7pUazqy2NunxUKw4b6toMAPl@rajje.db.elephantsql.com/thxxhadd',
+  connectionString: ,
   ssl: true,
 };
 
