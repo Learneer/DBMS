@@ -414,3 +414,64 @@ HAVING
                     company_name
             ) AS COUNTS
     );
+
+  --2k Find the company that has the smallest payroll.
+SELECT
+    company_name,
+    SUM(salary) AS TOTAL
+FROM
+    tbl_Works
+GROUP BY
+    company_name
+HAVING
+    SUM(salary) =(
+        SELECT
+            MIN(total_salary)
+        FROM
+            (
+                SELECT
+                    SUM(salary) AS total_salary
+                FROM
+                    tbl_Works
+                GROUP BY
+                    company_name
+            ) AS salaries
+    );
+
+--2lFind those companies whose employees earn a higher salary, on average, than the
+--average salary at First Bank Corporation.
+SELECT
+    company_name
+FROM
+    tbl_Works
+WHERE
+    salary >(
+        select
+            AVG(salary) as s
+        FROM
+            tbl_Works
+        WHERE
+            company_name = 'First Bank Corporation'
+    )
+    AND company_name <> 'First Bank Corporation'
+GROUP BY
+    company_name;
+
+
+
+SELECT
+    c.company_name
+FROM
+    tbl_Company 
+    JOIN tbl_Works w ON c.company_name = w.company_name
+GROUP BY
+    c.company_name
+HAVING
+    AVG(w.salary) > (
+        SELECT
+            AVG(salary)
+        FROM
+            tbl_Works
+        WHERE
+            company_name = 'First Bank Corporation'
+    );
