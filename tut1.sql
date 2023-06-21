@@ -475,3 +475,71 @@ HAVING
         WHERE
             company_name = 'First Bank Corporation'
     );
+
+
+
+--3a) Modify the database so that Jones now lives in Newtown
+UPDATE
+    tbl_employee
+SET
+    city = 'Newtown'
+WHERE
+    employee_name = 'Jones';
+
+
+
+--3bGive all employees of First Bank Corporation a 10 percent raise.
+UPDATE
+    tbl_Works
+SET
+    salary = salary * 1.1
+WHERE
+    company_name = 'First Bank Corporation';
+
+
+
+--3c Give all managers of First Bank Corporation a 10 percent raise.
+UPDATE
+    tbl_Works
+SET
+    salary = salary * 1.1
+WHERE
+    employee_name in (
+        SELECT
+            manager_name
+        FROM
+            tbl_Manages
+        WHERE
+            manager_name in (
+                select
+                    employee_name
+                FROM
+                    tbl_works w
+                WHERE
+                    w.employee_name = manager_name
+                    AND company_name = 'First Bank Corporation'
+            )
+    );
+
+
+
+-- (UPDATE
+--     tbl_Works
+-- SET
+--     salary = salary * 1.1
+-- WHERE
+--     employee_name IN (
+--         SELECT
+--             manager_name
+--         FROM
+--             tbl_Manages
+--         WHERE
+--             employee_name IN (
+--                 SELECT
+--                     employee_name
+--                 FROM
+--                     tbl_Works
+--                 WHERE
+--                     company_name = 'First Bank Corporation'
+--             )
+--     );)--this method doesnot work here because manager is from one company and employee from other company so this fails here
