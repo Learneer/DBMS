@@ -543,3 +543,28 @@ WHERE
 --                     company_name = 'First Bank Corporation'
 --             )
 --     );)--this method doesnot work here because manager is from one company and employee from other company so this fails here
+
+--3d Give all managers of First Bank Corporation a 10 percent raise unless the salary becomes greater than $100,000; in such cases, give only a 3 percent raise.
+UPDATE
+    tbl_Works
+SET
+    salary = CASE
+        WHEN salary * 1.1 <= 100000 THEN salary * 1.1
+        ELSE salary * 1.03
+    END
+WHERE
+    employee_name IN(
+        SELECT
+            m.manager_name
+        FROM
+            tbl_Manages m
+            JOIN tbl_Works w ON m.manager_name = w.employee_name
+        WHERE
+            w.company_name = 'First Bank Corporation'
+    ) 
+    
+--3e) Delete all tuples in the works relation for employees of Small Bank Corporation
+DELETE FROM
+    tbl_Works
+WHERE
+    company_name = 'Small Bank Corporation';
