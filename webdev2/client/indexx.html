@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>app</title>
+    <style>
+        /* General Styles */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        /* Navigation Styles */
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        .navigation a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        /* Form Styles */
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 1rem;
+        }
+
+        input:invalid {
+            border-color: red;
+        }
+
+        input:invalid + span {
+            color: red;
+            font-size: 0.8rem;
+        }
+
+        button[type="submit"] {
+            padding: 0.5rem 1rem;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Data Container Styles */
+
+        .data-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .data-container .get-all-data {
+            position: absolute;
+            right: 0;
+            top: -2rem;
+            padding: 0.5rem 1rem;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .data-container .get-all-data:hover {
+            background-color: #45a049;
+        }
+
+        /* Data Styles */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table th,
+        table td {
+            padding: 0.5rem;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+
+        .data-container p {
+            margin: 0;
+        }
+
+        .data button {
+            padding: 0.5rem 1rem;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        .data button:hover {
+            background-color: #45a049;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="navigation">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+    </div>
+    <form onsubmit="handleSubmit(event)" method="post">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" required />
+        <label for="roll">Roll No</label>
+        <input type="text" name="roll_no" id="roll" pattern="THA\d{3}[A-Z]{3}\d{3}" required />
+        <span>Format: THA followed by 3 digits, then 3 uppercase letters, and finally 3 digits.</span>
+        <label for="address">Address</label>
+        <input type="text" name="address" id="address" required />
+        <label for="phone">Phone</label>
+        <input type="text" name="phone" id="phone" required />
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" required />
+        <span>Example: abc@example.com</span>
+        <button type="submit">Submit</button>
+    </form>
+    <div class="data-container">
+        <button class="get-all-data" onclick="getAllData()">Get All Data</button>
+        <table id="data"></table>
+    </div>
+    <div class="navigation">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+    </div>
+</body>
+
+<script>
+    const saveDataOnSession = () => {
+        sessionStorage.setItem("data", JSON.stringify(data));
+    };
+
+    const getDataFromSession = () => {
+        const data = sessionStorage.getItem("data") || JSON.stringify([]);
+        return JSON.parse(data);
+    };
+
+    let data = getDataFromSession();
+
+    const getAllData = async () => {
+        const res = await fetch("http://localhost:3001/getAllData");
+        const result = await res.json();
+        data = result;
+        saveDataOnSession();
+        renderData();
+    };
+
+    const renderData = () => {
+        const dataTable = document.getElementById("data");
+        dataTable.innerHTML = `
+            <tr>
+                <th>Name</th>
+                <th>Roll No</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        `;
+    
+        const uniqueData = new Set();
+    
+        data.forEach((item) => {
+            const dataKey = `${item.name}-${item.roll_no}-${item.address}-${item.phone}-${item.email}`;
+            if (!uniqueData.has(dataKey)) {
+                uniqueData.add(dataKey);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.roll_no}</td>
+                    <td>${item.address}</td>
+                    <td>${item.phone}</td>
+                    <td>${item.email}</td>
+                    <td>
+                        <button id="${item.user_id}" onclick="deleteData(${item.user_id})">Delete</button>
+                        <button onclick="edit(${item.user_id})">Update</button>
+                    </td>
+                `;
+                dataTable.appendChild(row);
+            }
+        });
+    };
+    
+    renderData();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        await fetch("http://localhost:3001/form", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        await getAllData();
+    };
+
+    const deleteData = async (id) => {
+        await fetch(`http://localhost:3001/user/${id}`, {
+            method: "DELETE",
+        });
+        await getAllData();
+    };
+    const updateData = async (e, id) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        await fetch(`http://localhost:3001/user/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(Object.fromEntries(formData)),
+        });
+        await getAllData();
+        form.setAttribute("onsubmit", "handleSubmit(event)");
+    };
+    const edit = (id) => {
+        const selectedData = data.find((item) => item.user_id === id);
+        const form = document.querySelector("form");
+        form.querySelector("input[name='name']").value = selectedData.name;
+        form.querySelector("input[name='roll_no']").value = selectedData.roll_no;
+        form.querySelector("input[name='address']").value = selectedData.address;
+        form.querySelector("input[name='phone']").value = selectedData.phone;
+        form.querySelector("input[name='email']").value = selectedData.email;
+        form.setAttribute("onsubmit", `updateData(event,${id})`);
+    };
+</script>
+
+</html>
